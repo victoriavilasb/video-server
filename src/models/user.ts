@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Model, Error, model } from "mongoose";
+import { Document, Schema, Model, Error, model } from "mongoose";
 import bcrypt from "bcrypt-nodejs";
 
 export interface IUser extends Document {
@@ -7,10 +7,30 @@ export interface IUser extends Document {
     mobile_token: string;
 }
 
-const UserSchema: Schema = new Schema({
-    username: { Type: String, required: true, unique: true },
-    password: { Type: String, required: true },
-    mobile_token: { Type: String, required: true, unique: true }
+const userSchema: Schema = new Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    mobile_token: { type: String, required: false }
 });
 
-export default mongoose.model<IUser>("User", UserSchema);
+userSchema.pre<IUser>("save", function save(next) {
+    const user = this;
+
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) { return next(err); }
+
+      bcrypt.hash(this.password, salt, undefined, (err: Error, hash) => {
+        if (err) { return next(err); }
+        user.password = hash;
+        next();
+      });
+    });
+});
+
+userSchema.methods.comparePassword = function (candidatePassword: string, callback: any) {
+    bcrypt.compare(candidatePassword, this.password, (err: Error, isMatch: boolean) => {
+      callback(err, isMatch);
+    });
+};
+
+export const User: Model<IUser> = model<IUser>("User", userSchema);

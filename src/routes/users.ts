@@ -1,22 +1,27 @@
 import { Router } from "express";
-import { UserController } from "../controllers/userController";
+import { UsersController } from "../controllers/usersController";
 
-export class UserRoutes {
+export class UsersRoutes {
 
     router: Router;
-    public userController: UserController = new UserController();
+    public usersController: UsersController = new UsersController();
 
     constructor() {
         this.router = Router();
         this.routes();
     }
 
+    // PATCH Join/leave room
+    // GET Search rooms that a user is in /rooms/:user
     routes() {
-        this.router.get("/:username", this.userController.getUserByUsername);
-        this.router.get("/", this.userController.listUsers);
-        this.router.post("/register", this.userController.register);
-        this.router.patch("/:username/update", this.userController.updateUser);
-        this.router.delete("/:username/delete", this.userController.deleteUser);
+        this.router.get("/:username", this.usersController.getUserByUsername);
+        this.router.get("/", this.usersController.listUsers);
+        this.router.post("/register", this.usersController.register);
+        this.router.patch("/:username/update", this.usersController.updateUser);
+        this.router.delete("/:username/delete", this.usersController.deleteUser);
+        this.router.patch("/:username/join/:guid", this.usersController.joinRoom);
+        // this.router.patch("/:username/leave/:guid", this.usersController.leaveRoom);
+        // this.router.get("/:username/rooms", this.searchUserRooms);
     }
 }
 

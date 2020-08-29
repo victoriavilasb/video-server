@@ -2,20 +2,21 @@ import bcrypt from "bcrypt-nodejs";
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import  { User, IUser } from "../models/user";
+import  { Room, IRoom } from "../models/room";
 
-export class UserController {
+export class UsersController {
     public async register( req: Request, res: Response ): Promise<Response> {
         const { username, password, mobile_token } = req.body;
 
         const findUser = await User.findOne({ username }, (err: Error) => {
             if (err) {
-                console.error(err)
+                console.error(err);
             }
         });
 
-        if (findUser) 
-            return res.status(409).send({ error: "User already exists" })
-        
+        if (findUser)
+            return res.status(409).send({ error: "User already exists" });
+
         const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
         await User.create({
@@ -24,13 +25,13 @@ export class UserController {
             password: hashPassword
         }, (err: Error, res: any) => {
             if (err) {
-                console.error(err)
+                console.error(err);
             }
-        })    
+        });
 
-        const token = jwt.sign({ username: username, scope: req.body.scope }, process.env["JWT_SECRET"])
+        const token = jwt.sign({ username: username, scope: req.body.scope }, process.env["JWT_SECRET"]);
 
-        return res.status(201).json({ token: token });    
+        return res.status(201).json({ token: token });
     }
 
     public async getUserByUsername( req: Request, res: Response ): Promise<Response> {
@@ -102,11 +103,52 @@ export class UserController {
         await User.deleteOne({ username },
             (err: Error) => {
                 if (err) {
-                    console.error(err)
+                    console.error(err);
                 }
             }
-        )
+        );
 
-        return res.status(204).json({ msg: "User deleted sucessfully"})
+        return res.status(204).json({ msg: "User deleted sucessfully"});
     }
-};
+
+    public async joinRoom( req: Request, res: Response): Promise<Response> {
+        const { username, guid } = req.params;
+
+        const user = await Room.findOne({ username },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        if (user) {
+            return res.status(400).json({ msg: `User not found`, username });
+        }
+
+        const room = await Room.findOne({ guid },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        if (!room) {
+            return res.status(400).json({ msg: `Room not found` });
+        }
+
+        const { participants } = room;
+        participants.push(username);
+        await Room.updateOne({ guid },
+            { participants },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        return res.status(204).json({ msg: `User ${username} joinned room`});
+    }
+}

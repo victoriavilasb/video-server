@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import { UserRoutes } from "./routes/users";
+import { UsersRoutes } from "./routes/users";
+import { RoomsRoutes } from "./routes/rooms";
 class Server {
     public app: express.Application;
 
@@ -17,7 +18,8 @@ class Server {
     }
 
     public routes(): void {
-        this.app.use("/users", new UserRoutes().router);
+        this.app.use("/users", new UsersRoutes().router);
+        this.app.use("/rooms", new RoomsRoutes().router);
     }
 
     public config(): void {

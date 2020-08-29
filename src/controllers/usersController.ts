@@ -15,6 +15,14 @@ export class UsersController {
         });
     }
 
+    private findUserInRoom ( username: string, room: IRoom ): Boolean {
+        const { participants, host_user } = room;
+
+        participants.push(host_user);
+
+        return participants.some(participant => participant == username);
+    }
+
     public async register( req: Request, res: Response ): Promise<Response> {
         const { username, password, mobile_token } = req.body;
 
@@ -136,6 +144,10 @@ export class UsersController {
 
         if (participants.length == capacity) {
             return res.status(409).json({ msg: `Room is full, user can noit join.`});
+        }
+
+        if (this.findUserInRoom(username, room)) {
+            return res.status(409).json({ msg: `User is already in room.`});
         }
 
         participants.push(username);

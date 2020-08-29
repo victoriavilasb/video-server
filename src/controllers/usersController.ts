@@ -88,22 +88,22 @@ export class UsersController {
     }
 
     public async updateUser( req: Request, res: Response ): Promise<Response> {
-        const { username, password, mobile_token } = req.body
+        const { username, password, mobile_token } = req.body;
 
         const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-        await User.findOneAndUpdate({ username }, 
-            { 
-                username, 
+        await User.findOneAndUpdate({ username },
+            {
+                username,
                 password: hashPassword,
                 mobile_token
             }, (err: Error) => {
             if (err) {
-                console.error(err)
+                console.error(err);
             }
-        })
+        });
 
-        return res.status(204)
+        return res.status(204);
     }
 
     public async deleteUser( req: Request, res: Response): Promise<Response> {
@@ -132,7 +132,7 @@ export class UsersController {
         );
 
         if (user) {
-            return res.status(400).json({ msg: `User not found`, username });
+            return res.status(400).json({ msg: `User not found.`, username });
         }
 
         const room = await Room.findOne({ guid },
@@ -148,12 +148,12 @@ export class UsersController {
         }
 
         if (this.findUserInRoom(username, room)) {
-            return res.status(409).json({ msg: `User is already in room.`});
+            return res.status(409).json({ msg: `User is already in the room.`});
         }
 
         const { participants, capacity } = room;
         if (participants.length == capacity) {
-            return res.status(409).json({ msg: `Room is full, user can noit join.`});
+            return res.status(409).json({ msg: `Room is full, user can not join.`});
         }
 
         participants.push(username);

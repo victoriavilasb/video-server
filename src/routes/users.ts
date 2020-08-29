@@ -12,11 +12,11 @@ export class UserRoutes {
     }
 
     routes() {
-        // this.router.get("/:username", this.userController.getUserByUsername);
-        // this.router.get("/", this.userController.listUsers);
+        this.router.get("/:username", this.userController.getUserByUsername);
+        this.router.get("/", this.userController.listUsers);
         this.router.post("/register", this.userController.register);
-        // this.router.patch("/:username/update", this.userController.updateUser);
-        // this.router.delete("/:username/delete", this.userController.deleteUser);
+        this.router.patch("/:username/update", this.userController.updateUser);
+        this.router.delete("/:username/delete", this.userController.deleteUser);
     }
 }
 

@@ -5,6 +5,16 @@ import  { User, IUser } from "../models/user";
 import  { Room, IRoom } from "../models/room";
 
 export class UsersController {
+    private formatUserResponse( users: Array<IUser> ): Array<Object> {
+        return users.map(user => {
+            const { username, mobile_token } = user;
+            return {
+                username,
+                mobile_token
+            };
+        });
+    }
+
     public async register( req: Request, res: Response ): Promise<Response> {
         const { username, password, mobile_token } = req.body;
 
@@ -39,41 +49,25 @@ export class UsersController {
 
         const users = await User.find({ username }, (err: Error) => {
             if (err) {
-                console.error(err)
+                console.error(err);
             }
-        })
+        });
 
         if (users)
-            return res.status(200).json({ data: 
-                users.map(user => {
-                    const { username, mobile_token } = user;
-                    return {
-                        username,
-                        mobile_token
-                    }
-                }) 
-            });
+            return res.status(200).json({ data: this.formatUserResponse(users) });
 
-        return res.status(404).send({ error: "User not found"})
+        return res.status(404).send({ error: "User not found" });
     }
 
     public async listUsers( req: Request, res: Response ): Promise<Response> {
         const users = await User.find({ }, (err: Error) => {
             if (err) {
-                console.error(err)
+                console.error(err);
             }
-        })
+        });
 
         if (users)
-            return res.status(200).json({ data: 
-                users.map(user => {
-                    const { username, mobile_token } = user;
-                    return {
-                        username,
-                        mobile_token
-                    }
-                }) 
-            });
+            return res.status(200).json({ data: this.formatUserResponse(users) });
 
         return res.status(404).send({ error: "User not found"});
     }
@@ -138,7 +132,12 @@ export class UsersController {
             return res.status(400).json({ msg: `Room not found` });
         }
 
-        const { participants } = room;
+        const { participants, capacity } = room;
+
+        if (participants.length == capacity) {
+            return res.status(409).json({ msg: `Room is full, user can noit join.`});
+        }
+
         participants.push(username);
         await Room.updateOne({ guid },
             { participants },

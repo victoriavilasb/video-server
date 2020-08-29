@@ -5,6 +5,13 @@ import  { User, IUser } from "../models/user";
 import  { Room, IRoom } from "../models/room";
 
 export class UsersController {
+    constructor() {
+        this.joinRoom  = this.joinRoom.bind(this);
+        this.leaveRoom  = this.leaveRoom.bind(this);
+        this.getUserByUsername = this.getUserByUsername.bind(this);
+        this.listUsers = this.listUsers.bind(this);
+    }
+
     private formatUserResponse( users: Array<IUser> ): Array<Object> {
         return users.map(user => {
             const { username, mobile_token } = user;
@@ -15,12 +22,12 @@ export class UsersController {
         });
     }
 
-    private findUserInRoom ( username: string, room: IRoom ): Boolean {
+    private findUserInRoom( username: string, room: IRoom ): Boolean {
         const { participants, host_user } = room;
 
-        participants.push(host_user);
+        const allParticipants = [...participants, host_user];
 
-        return participants.some(participant => participant == username);
+        return allParticipants.some(participant => participant == username);
     }
 
     public async register( req: Request, res: Response ): Promise<Response> {
@@ -140,14 +147,13 @@ export class UsersController {
             return res.status(400).json({ msg: `Room not found` });
         }
 
-        const { participants, capacity } = room;
-
-        if (participants.length == capacity) {
-            return res.status(409).json({ msg: `Room is full, user can noit join.`});
-        }
-
         if (this.findUserInRoom(username, room)) {
             return res.status(409).json({ msg: `User is already in room.`});
+        }
+
+        const { participants, capacity } = room;
+        if (participants.length == capacity) {
+            return res.status(409).json({ msg: `Room is full, user can noit join.`});
         }
 
         participants.push(username);
@@ -160,6 +166,87 @@ export class UsersController {
             }
         );
 
-        return res.status(204).json({ msg: `User ${username} joinned room`});
+        return res.status(204).json({ msg: `User ${username} has join room`});
+    }
+
+    public async leaveRoom( req: Request, res: Response): Promise<Response> {
+        const { username, guid } = req.params;
+
+        const user = await Room.findOne({ username },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        if (user) {
+            return res.status(400).json({ msg: `User not found`, username });
+        }
+
+        const room = await Room.findOne({ guid },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        if (!room) {
+            return res.status(400).json({ msg: `Room not found` });
+        }
+
+        if (!this.findUserInRoom(username, room)) {
+            return res.status(404).json({ msg: `User is not in room.`});
+        }
+
+        let { participants, host_user } = room;
+
+        participants = participants.filter(participant => participant != username);
+
+        if (host_user == username) {
+            host_user = participants[0];
+        }
+
+        await Room.updateOne({ guid },
+            { participants, host_user },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        return res.status(204).send({ data: `User ${username} has leave room`});
+    }
+
+    public async searchUserRooms( req: Request, res: Response ): Promise<Response> {
+        const { username } = req.params;
+
+        const user = await Room.findOne({ username },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        if (user) {
+            return res.status(400).json({ msg: `User not found`, username });
+        }
+
+        const rooms = await Room.find( {},
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        const listOfRooms = rooms.filter(room => {
+            return room.participants.includes(username);
+        }).map(room => room.guid);
+
+        return res.status(200).json({ data: listOfRooms });
     }
 }

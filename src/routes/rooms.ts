@@ -14,6 +14,6 @@ export class RoomsRoutes {
     routes() {
         this.router.post("/", this.roomsController.createRoom);
         // this.router.patch("/:room/updateHost", this.roomsController.updateRoom);
-        // this.router.get("/:room", this.roomsController.getRoom);
+        this.router.get("/:guid", this.roomsController.findRoom);
     }
 }

@@ -3,24 +3,6 @@ import  { Room, IRoom } from "../models/room";
 import  { User, IUser } from "../models/user";
 
 export class RoomsController {
-    constructor() {
-        this.createRoom = this.createRoom.bind(this);
-    }
-
-    private checkIfUserExists(username: string): Boolean {
-        let user;
-        async () => {
-            user = await User.findOne({ username },
-                (err: Error) => {
-                    if (err)
-                        console.error(err);
-                }
-            );
-        };
-
-        return !!user;
-    }
-
     public async createRoom( req: Request, res: Response ): Promise<Response> {
         const { guid, host_user, participants } = req.body;
 
@@ -36,12 +18,6 @@ export class RoomsController {
             return res.status(409).json({ error: "Room already exists" });
         }
 
-        const checkParticipants = [...participants, host_user].
-            every((participant: string) => this.checkIfUserExists(participant));
-
-        if (!checkParticipants) {
-            return res.status(400).json({ error: "User does not exist" });
-        }
 
         if (!participants.includes(host_user)) {
             req.body.participants = req.body.participants.push(host_user);

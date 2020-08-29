@@ -7,10 +7,10 @@ services:
       - "27017:27017"
     volumes:
       - ./.data:/data/db
-  api:
-    container_name: api
-    build: .
-    ports:
-      - "3000:3000"
-    volumes: 
-      - ./:home/node/app
+  # api:
+  #   container_name: api
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   volumes: 
+  #     - ./:home/node/app

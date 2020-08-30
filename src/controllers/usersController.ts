@@ -96,9 +96,6 @@ export class UsersController {
                 password: hashPassword,
                 mobile_token
             }, (err: Error, user) => {
-            if (!user) {
-                return res.status(404).send({msg: "User not found."});
-            }
             if (err) {
                 console.error(err);
             }

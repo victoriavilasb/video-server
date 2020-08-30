@@ -6,7 +6,9 @@ module.exports = {
 
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
 
-  preset: 'ts-jest',
+  preset: '@shelf/jest-mongodb',
 
-  testEnvironment: 'node'
+  testEnvironment: 'node',
+
+  modulePathIgnorePatterns: ["tests/model/dist"]
 }

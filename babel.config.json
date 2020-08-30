@@ -1,0 +1,6 @@
+{
+    "presets": ["@babel/preset-typescript", ["@babel/preset-env", {
+        "useBuiltIns": false
+      }]],
+    "plugins": ["@babel/plugin-syntax-flow", "@babel/plugin-transform-runtime"]
+  }

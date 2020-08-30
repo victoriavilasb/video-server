@@ -42,12 +42,10 @@ export class UsersController {
         if (findUser)
             return res.status(409).send({ error: "User already exists" });
 
-        const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-
         await User.create({
             username,
-            mobile_token: mobile_token,
-            password: hashPassword
+            mobile_token,
+            password
         }, (err: Error, res: any) => {
             if (err) {
                 console.error(err);

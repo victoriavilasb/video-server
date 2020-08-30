@@ -29,7 +29,7 @@ export class UsersController {
 
         return allParticipants.some(participant => participant == username);
     }
-
+ 
     public async register( req: Request, res: Response ): Promise<Response> {
         const { username, password, mobile_token } = req.body;
 
@@ -86,7 +86,8 @@ export class UsersController {
     }
 
     public async updateUser( req: Request, res: Response ): Promise<Response> {
-        const { username, password, mobile_token } = req.body;
+        const { username } = req.params;
+        const { password, mobile_token } = req.body;
 
         const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 

@@ -14,4 +14,4 @@ RUN npm install --save
 
 EXPOSE 3000
 
-CMD npm run serve
+CMD npm run build && npm run serve

@@ -2,6 +2,16 @@
 
 In this api you will be able to create, update, delete users, and deal with rooms.
 
+### How to run
+
+```
+docker-compose build
+docker-compose up
+```
+
+You will find database in port **27017**
+
+The serve in in **http://localhost:3000**
 
 ### Authentication
 

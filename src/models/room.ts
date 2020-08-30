@@ -1,20 +1,19 @@
-import mongoose, { Document, Schema, Model, Error, model } from "mongoose";
-import bcrypt from "bcrypt-nodejs";
+import { Document, Schema, Model, Error, model } from "mongoose";
 
 export interface IRoom extends Document {
     name: string;
     guid: string;
-    hostUser: string;
+    host_user: string;
     participants: Array<string>;
     capacity: number;
 }
 
 const RoomSchema: Schema = new Schema({
-    name: { Type: String, required: true },
-    guid: { Type: String, required: true, unique: true },
-    hostUser: { Type: String, required: true },
-    participants: { Type: Array, required: true },
-    capacity: { Type: Number, required: true, default: 5 }
+    name: { type: String, required: true },
+    guid: { type: String, required: true, unique: true },
+    host_user: { type: String, required: true },
+    participants: { type: Array, required: true },
+    capacity: { type: Number, required: true, default: 5 }
 });
 
-export default mongoose.model<IRoom>("Room", RoomSchema);
+export const Room: Model<IRoom> = model<IRoom>("Room", RoomSchema);

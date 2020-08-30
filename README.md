@@ -11,7 +11,7 @@ docker-compose up
 
 You will find database in port **27017**
 
-The serve in in **http://localhost:3000**
+The serve is in **http://localhost:3000**
 
 ### Authentication
 

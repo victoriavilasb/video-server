@@ -11,7 +11,6 @@ export class UsersRoutes {
         this.routes();
     }
 
-    // GET Search rooms that a user is in /rooms/:user
     routes() {
         this.router.get("/:username", this.usersController.getUserByUsername);
         this.router.get("/", this.usersController.listUsers);

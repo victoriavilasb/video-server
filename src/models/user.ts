@@ -1,6 +1,8 @@
 import { Document, Schema, Model, Error, model } from "mongoose";
 import bcrypt from "bcrypt-nodejs";
 
+const salt = bcrypt.genSaltSync(4);
+
 export interface IUser extends Document {
     username: string;
     password: string;
@@ -16,21 +18,28 @@ const userSchema: Schema = new Schema({
 userSchema.pre<IUser>("save", function save(next) {
     const user = this;
 
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) { return next(err); }
-
-      bcrypt.hash(this.password, salt, undefined, (err: Error, hash) => {
-        if (err) { return next(err); }
-        user.password = hash;
-        next();
-      });
-    });
+    if (user.isModified("password") || user.isNew) {
+        bcrypt.hash(this.password, salt, undefined, (err: Error, hash) => {
+            console.log(hash);
+            if (err) return next(err);
+            user.password = hash;
+            next();
+        });
+    }
 });
 
 userSchema.methods.comparePassword = function (candidatePassword: string, callback: any) {
-    bcrypt.compare(candidatePassword, this.password, (err: Error, isMatch: boolean) => {
-      callback(err, isMatch);
-    });
+    const user = this;
+        bcrypt.hash(candidatePassword, salt, undefined, (err: Error, hash) => {
+            if (err) return callback(err);
+
+            const check = bcrypt.compareSync(candidatePassword, hash);
+            if (check) {
+                return callback(undefined, true);
+            }
+
+            return callback(undefined, false);
+        });
 };
 
 export const User: Model<IUser> = model<IUser>("User", userSchema);

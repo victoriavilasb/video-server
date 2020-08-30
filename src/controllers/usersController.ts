@@ -97,13 +97,16 @@ export class UsersController {
                 username,
                 password: hashPassword,
                 mobile_token
-            }, (err: Error) => {
+            }, (err: Error, user) => {
+            if (!user) {
+                return res.status(404).send({msg: "User not found."});
+            }
             if (err) {
                 console.error(err);
             }
         });
 
-        return res.status(204);
+        return res.status(204).send({status: "ok"});
     }
 
     public async deleteUser( req: Request, res: Response): Promise<Response> {

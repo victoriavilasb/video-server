@@ -13,7 +13,7 @@ export class RoomsRoutes {
 
     routes() {
         this.router.post("/", this.roomsController.createRoom);
-        // this.router.patch("/:room/updateHost", this.roomsController.updateRoom);
+        this.router.patch("/:guid/updateHost", this.roomsController.updateHost);
         this.router.get("/:guid", this.roomsController.findRoom);
     }
 }

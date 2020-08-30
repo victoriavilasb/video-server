@@ -1,6 +1,5 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import  { Room, IRoom } from "../models/room";
-import  { User, IUser } from "../models/user";
 
 export class RoomsController {
     public async createRoom( req: Request, res: Response ): Promise<Response> {
@@ -50,5 +49,33 @@ export class RoomsController {
         }
 
         return res.status(200).json({ data: room });
+    }
+
+    public async updateHost( req: Request, res: Response ): Promise<Response> {
+        const { guid } = req.params;
+        const { host_user } = req.body;
+
+        const room  = await Room.findOne({ guid },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        const { participants } = room;
+        if (!participants.includes(host_user)) {
+            return res.status(404).json({err: "User is not a participant of the room."});
+        }
+
+        await Room.updateOne({ guid }, { host_user: host_user },
+            (err: Error) => {
+                if (err) {
+                    console.error(err);
+                }
+            }
+        );
+
+        return res.status(200).json({ status: "ok" });
     }
 }

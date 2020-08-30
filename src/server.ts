@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 
 import { UsersRoutes } from "./routes/users";
 import { RoomsRoutes } from "./routes/rooms";
+import { AuthRoute } from "./routes/auth";
 class Server {
     public app: express.Application;
 
@@ -20,6 +21,7 @@ class Server {
     public routes(): void {
         this.app.use("/users", new UsersRoutes().router);
         this.app.use("/rooms", new RoomsRoutes().router);
+        this.app.use("/login", new AuthRoute().router);
     }
 
     public config(): void {
